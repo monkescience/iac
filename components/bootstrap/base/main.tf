@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "state" {
   bucket = module.s3_bucket_name.name
 
   lifecycle {
-    prevent_destroy = false
+    prevent_destroy = true
   }
 }
 

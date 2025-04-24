@@ -1,3 +1,7 @@
+terraform {
+  backend "s3" {}
+}
+
 module "tags" {
   source = "../../../modules/tags"
 
