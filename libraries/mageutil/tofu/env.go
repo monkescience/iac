@@ -12,6 +12,6 @@ type StageProps struct {
 func getStageEnvVars() StageProps {
 	return StageProps{
 		Region:      mageutil.GetEnvValueOrWaitForInput("REGION", "eu-central-1"),
-		Environment: mageutil.GetEnvValueOrWaitForInput("ENVIRONMENT", "test"),
+		Environment: mageutil.GetEnvValueOrWaitForInput("ENVIRONMENT", "dev"),
 	}
 }
