@@ -27,3 +27,9 @@ variable "public_subnets" {
     availability_zone = string
   }))
 }
+
+variable "enable_nat_gateways" {
+  description = "Whether to create NAT gateways for private subnets to access the internet"
+  type        = bool
+  default     = false
+}

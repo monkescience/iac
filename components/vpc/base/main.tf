@@ -126,6 +126,8 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_route_table" "private" {
+  count = var.enable_nat_gateways ? 0 : 1
+
   vpc_id = aws_vpc.vpc.id
 
   tags = {
@@ -134,40 +136,48 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route_table_association" "private" {
-  for_each = aws_subnet.private
+  for_each = var.enable_nat_gateways ? {} : aws_subnet.private
 
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private[0].id
 }
 
-# Commented out because $$$$$$
-# resource "aws_eip" "private" {
-#   for_each = aws_subnet.private
-#
-#   domain = "vpc"
-# }
-#
-# resource "aws_nat_gateway" "private" {
-#   for_each = aws_subnet.private
-#
-#   allocation_id = aws_eip.private[each.key].id
-#   subnet_id     = each.value.id
-# }
-#
-# resource "aws_route_table" "private_internet" {
-#   for_each = aws_nat_gateway.private
-#
-#   vpc_id = aws_vpc.vpc.id
-#
-#   route {
-#     cidr_block     = "0.0.0.0/0"
-#     nat_gateway_id = each.value.id
-#   }
-# }
-#
-# resource "aws_route_table_association" "private_internet" {
-#   for_each = aws_subnet.private
-#
-#   subnet_id      = each.value.id
-#   route_table_id = aws_route_table.private_internet[each.key].id
-# }
+# NAT Gateway resources - can be enabled/disabled with var.enable_nat_gateways
+resource "aws_eip" "private_internet" {
+  for_each = var.enable_nat_gateways ? aws_subnet.private : {}
+
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "private_internet" {
+  for_each = var.enable_nat_gateways ? aws_subnet.private : {}
+
+  allocation_id = aws_eip.private_internet[each.key].id
+  subnet_id     = each.value.id
+
+  tags = {
+    Name = "${module.vpc_name.name}-nat-${each.value.availability_zone}"
+  }
+}
+
+resource "aws_route_table" "private_internet" {
+  for_each = var.enable_nat_gateways ? aws_nat_gateway.private_internet : {}
+
+  vpc_id = aws_vpc.vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = each.value.id
+  }
+
+  tags = {
+    Name = "${module.vpc_name.name}-private-${aws_subnet.private[each.key].availability_zone}"
+  }
+}
+
+resource "aws_route_table_association" "private_internet" {
+  for_each = var.enable_nat_gateways ? aws_subnet.private : {}
+
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.private_internet[each.key].id
+}
