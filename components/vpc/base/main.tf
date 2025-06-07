@@ -94,6 +94,8 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_route_table" "public" {
+  for_each = aws_subnet.public
+
   vpc_id = aws_vpc.vpc.id
 
   route {
@@ -102,7 +104,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name = "${module.vpc_name.name}-public"
+    Name = "${module.vpc_name.name}-public-${each.value.availability_zone}"
   }
 }
 
@@ -110,7 +112,7 @@ resource "aws_route_table_association" "public" {
   for_each = aws_subnet.public
 
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_route_table.public[each.key].id
 }
 
 resource "aws_subnet" "private" {
@@ -125,32 +127,21 @@ resource "aws_subnet" "private" {
   }
 }
 
-resource "aws_route_table" "private" {
-  count = var.enable_nat_gateways ? 0 : 1
-
-  vpc_id = aws_vpc.vpc.id
-
-  tags = {
-    Name = "${module.vpc_name.name}-private"
-  }
-}
-
-resource "aws_route_table_association" "private" {
-  for_each = var.enable_nat_gateways ? {} : aws_subnet.private
-
-  subnet_id      = each.value.id
-  route_table_id = aws_route_table.private[0].id
-}
-
 # NAT Gateway resources - can be enabled/disabled with var.enable_nat_gateways
 resource "aws_eip" "private_internet" {
-  for_each = var.enable_nat_gateways ? aws_subnet.private : {}
+  for_each = var.enable_nat_gateways ? aws_subnet.public : {}
 
   domain = "vpc"
+
+  tags = {
+    Name = "${module.vpc_name.name}-nat-eip-${each.value.availability_zone}"
+  }
+
+  depends_on = [aws_internet_gateway.vpc]
 }
 
 resource "aws_nat_gateway" "private_internet" {
-  for_each = var.enable_nat_gateways ? aws_subnet.private : {}
+  for_each = var.enable_nat_gateways ? aws_subnet.public : {}
 
   allocation_id = aws_eip.private_internet[each.key].id
   subnet_id     = each.value.id
@@ -158,6 +149,8 @@ resource "aws_nat_gateway" "private_internet" {
   tags = {
     Name = "${module.vpc_name.name}-nat-${each.value.availability_zone}"
   }
+
+  depends_on = [aws_internet_gateway.vpc]
 }
 
 resource "aws_route_table" "private_internet" {
@@ -171,13 +164,13 @@ resource "aws_route_table" "private_internet" {
   }
 
   tags = {
-    Name = "${module.vpc_name.name}-private-${aws_subnet.private[each.key].availability_zone}"
+    Name = "${module.vpc_name.name}-private-${aws_subnet.public[each.key].availability_zone}"
   }
 }
 
-resource "aws_route_table_association" "private_internet" {
+resource "aws_route_table_association" "private" {
   for_each = var.enable_nat_gateways ? aws_subnet.private : {}
 
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.private_internet[each.key].id
+  route_table_id = aws_route_table.private_internet[local.availability_zone_to_public_subnets_map[each.value.availability_zone]].id
 }
