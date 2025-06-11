@@ -69,7 +69,7 @@ resource "helm_release" "argocd" {
   chart            = "argo-cd"
   namespace        = "argocd"
   create_namespace = true
-  version          = "8.0.16"
+  version          = "8.0.17"
 
   depends_on = [module.eks]
 }
