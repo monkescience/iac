@@ -1,7 +1,7 @@
 resource "aws_ssoadmin_permission_set" "admin" {
   instance_arn     = tolist(data.aws_ssoadmin_instances.sso_instance.arns)[0]
   name             = "admin"
-  session_duration = "PT2H"
+  session_duration = "PT8H"
 }
 
 resource "aws_ssoadmin_managed_policy_attachment" "admin" {
