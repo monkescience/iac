@@ -28,6 +28,12 @@ variable "public_subnets" {
   }))
 }
 
+variable "enable_fck_nat" {
+  description = "Whether to create FCK NAT gateways for private subnets to access the internet"
+  type        = bool
+  default     = false
+}
+
 variable "enable_nat_gateways" {
   description = "Whether to create NAT gateways for private subnets to access the internet"
   type        = bool

@@ -16,6 +16,8 @@ module "base" {
     { availability_zone = "eu-central-1b", cidr_block = "10.69.80.0/20" },
     { availability_zone = "eu-central-1c", cidr_block = "10.69.96.0/20" }
   ]
+  # $
+  enable_fck_nat = false
   # $$$
   enable_nat_gateways = false
 }
