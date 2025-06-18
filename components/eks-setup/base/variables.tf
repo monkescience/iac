@@ -30,3 +30,8 @@ variable "eks_cluster_oidc_issuer_url" {
   description = "The OIDC issuer URL for the EKS cluster"
 }
 
+variable "route53_hosted_zone_id" {
+  type        = string
+  description = "The ID of the Route 53 hosted zone where the EKS cluster will be registered"
+}
+
