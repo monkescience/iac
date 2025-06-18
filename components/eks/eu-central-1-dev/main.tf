@@ -5,7 +5,7 @@ module "base" {
   environment = var.environment
   project     = var.project
 
-  eks_version = "1.32"
+  eks_version = "1.33"
   eks_vpc_id  = "vpc-0e1e0fecc375943f4"
   eks_subnet_ids = [
     "subnet-048f9754642b3e67c",
