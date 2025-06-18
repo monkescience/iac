@@ -7,45 +7,6 @@ import (
 
 type Tofu mg.Namespace
 
-// Upgrade upgrade the tofu providers
-func (Tofu) Upgrade() error {
-	stageEnvVars := getStageEnvVars()
-
-	configPath := NewConfigPath(stageEnvVars.Region, stageEnvVars.Environment)
-	config, err := NewConfig(configPath)
-	if err != nil {
-		return err
-	}
-
-	component, err := NewComponentName()
-	if err != nil {
-		return err
-	}
-
-	err = sh.RunV("tofu",
-		"-chdir="+NewRootPath(stageEnvVars.Region, stageEnvVars.Environment),
-		"init",
-		"-upgrade",
-		"-backend-config=region="+stageEnvVars.Region,
-		"-backend-config=bucket="+config.S3BackendConfig.Bucket,
-		"-backend-config=use_lockfile="+config.S3BackendConfig.UseLockfile,
-		"-backend-config=encrypt="+config.S3BackendConfig.Encrypt,
-		"-backend-config=key="+NewStateFilePath(component),
-	)
-	if err != nil {
-		return err
-	}
-
-	return sh.RunV("tofu",
-		"-chdir="+NewRootPath(stageEnvVars.Region, stageEnvVars.Environment),
-		"providers",
-		"lock",
-		"-platform=darwin_amd64",
-		"-platform=linux_amd64",
-		"-platform=windows_amd64",
-	)
-}
-
 // Init initializes the tofu project
 func (Tofu) Init() error {
 	stageEnvVars := getStageEnvVars()
@@ -64,7 +25,6 @@ func (Tofu) Init() error {
 	return sh.RunV("tofu",
 		"-chdir="+NewRootPath(stageEnvVars.Region, stageEnvVars.Environment),
 		"init",
-		"-lockfile=readonly",
 		"-backend-config=region="+stageEnvVars.Region,
 		"-backend-config=bucket="+config.S3BackendConfig.Bucket,
 		"-backend-config=use_lockfile="+config.S3BackendConfig.UseLockfile,
