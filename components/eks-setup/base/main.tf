@@ -6,6 +6,8 @@ resource "helm_release" "argocd" {
   namespace        = "argocd"
   create_namespace = true
   version          = "8.1.1"
+  wait             = true
+  timeout          = 600
 }
 
 resource "kubernetes_secret" "argocd_git" {
