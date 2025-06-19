@@ -447,7 +447,7 @@ resource "helm_release" "argocd" {
   chart            = "argo-cd"
   namespace        = "argocd"
   create_namespace = true
-  version          = "8.0.17"
+  version          = "8.1.1"
 }
 
 resource "kubernetes_secret" "argocd_git" {
