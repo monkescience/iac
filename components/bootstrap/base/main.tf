@@ -1,5 +1,6 @@
+# Tofu State Resources
 resource "aws_s3_bucket" "state" {
-  bucket = module.s3_bucket_name.name
+  bucket = "${module.this.name}-iac-tofu-state"
 
   lifecycle {
     prevent_destroy = true
@@ -39,7 +40,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "state" {
   bucket = aws_s3_bucket.state.bucket
 
   rule {
-    id     = "${module.s3_bucket_name.name}-1"
+    id     = "noncurrent-version-expiration"
     status = "Enabled"
 
     filter {

@@ -16,7 +16,7 @@ resource "aws_organizations_account" "prod" {
 }
 
 resource "aws_budgets_budget" "org" {
-  name         = module.budget_name.name
+  name         = "${module.this.name}-budget"
   budget_type  = "COST"
   limit_amount = "50"
   limit_unit   = "USD"

@@ -5,11 +5,11 @@ module "account_check" {
   environment = var.environment
 }
 
-module "budget_name" {
+module "this" {
   source = "../../../modules/name"
 
   project     = var.project
   region      = var.region
   environment = var.environment
-  name        = "budget"
+  name        = null
 }

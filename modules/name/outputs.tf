@@ -1,3 +1,3 @@
 output "name" {
-  value = "${var.project}-${var.region}-${var.environment}-${var.name}"
+  value = var.name != null ? "${var.project}-${var.region}-${var.environment}-${var.name}" : "${var.project}-${var.region}-${var.environment}"
 }
