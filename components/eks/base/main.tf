@@ -58,7 +58,7 @@ resource "aws_eks_access_entry" "eks_cluster_admin" {
   type          = "STANDARD"
 }
 
-resource "aws_eks_access_policy_association" "example" {
+resource "aws_eks_access_policy_association" "eks_cluster_admin" {
   for_each = var.eks_cluster_admin_principal_arns
 
   cluster_name  = aws_eks_cluster.eks.name
@@ -68,4 +68,20 @@ resource "aws_eks_access_policy_association" "example" {
   access_scope {
     type = "cluster"
   }
+}
+
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.eks.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  url = aws_eks_cluster.eks.identity[0].oidc[0].issuer
+
+  client_id_list = [
+    "sts.amazonaws.com"
+  ]
+
+  thumbprint_list = data.tls_certificate.eks.certificates[*].sha1_fingerprint
+
+  depends_on = [aws_eks_cluster.eks]
 }

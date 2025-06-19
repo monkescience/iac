@@ -7,14 +7,14 @@ data "aws_iam_policy_document" "cert_manager_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${module.account_check.account_id}:oidc-provider/${var.eks_cluster_oidc_issuer_url}"]
+      identifiers = ["arn:aws:iam::${module.account_check.account_id}:oidc-provider/${local.eks_cluster_oidc_issuer_uri}"]
     }
 
     actions = ["sts:AssumeRoleWithWebIdentity"]
 
     condition {
       test     = "StringEquals"
-      variable = "${var.eks_cluster_oidc_issuer_url}:sub"
+      variable = "${local.eks_cluster_oidc_issuer_uri}:sub"
       values   = ["system:serviceaccount:cert-manager:cert-manager"]
     }
   }
@@ -27,7 +27,7 @@ resource "aws_iam_role" "cert_manager" {
 
 resource "aws_iam_role_policy" "cert_manager" {
   name   = "CertManagerPolicy"
-  role   = aws_iam_role.aws_lb_controller.id
+  role   = aws_iam_role.cert_manager.id
   policy = data.aws_iam_policy_document.cert_manager.json
 }
 
@@ -101,14 +101,14 @@ data "aws_iam_policy_document" "aws_lb_controller_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${module.account_check.account_id}:oidc-provider/${var.eks_cluster_oidc_issuer_url}"]
+      identifiers = ["arn:aws:iam::${module.account_check.account_id}:oidc-provider/${local.eks_cluster_oidc_issuer_uri}"]
     }
 
     actions = ["sts:AssumeRoleWithWebIdentity"]
 
     condition {
       test     = "StringEquals"
-      variable = "${var.eks_cluster_oidc_issuer_url}:sub"
+      variable = "${local.eks_cluster_oidc_issuer_uri}:sub"
       values   = ["system:serviceaccount:kube-system:aws-load-balancer-controller"]
     }
   }
