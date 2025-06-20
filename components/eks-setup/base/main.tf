@@ -8,6 +8,13 @@ resource "helm_release" "argocd" {
   version          = "8.1.1"
   wait             = true
   timeout          = 600
+
+  set = [
+    {
+      name  = "configs.params.server\\.insecure"
+      value = true
+    }
+  ]
 }
 
 resource "kubernetes_secret" "argocd_git" {
