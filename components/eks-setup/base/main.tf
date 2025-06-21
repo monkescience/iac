@@ -9,20 +9,8 @@ resource "helm_release" "argocd" {
   wait             = true
   timeout          = 600
 
-  set = [
-    {
-      name  = "configs.params.server\\.insecure"
-      value = true
-    },
-    {
-      name  = "server.autoscaling\\.enabled"
-      value = true
-    },
-    {
-      name  = "repoServer.autoscaling\\.enabled"
-      value = true
-    }
-  ]
+
+  values = [file("${path.module}/argocd-config.yaml")]
 }
 
 resource "kubernetes_secret" "argocd_git" {
