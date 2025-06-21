@@ -11,5 +11,5 @@ module "eks_name" {
   project     = var.project
   region      = var.region
   environment = var.environment
-  name        = "main"
+  name        = null
 }
