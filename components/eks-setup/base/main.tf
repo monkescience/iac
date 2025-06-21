@@ -13,6 +13,14 @@ resource "helm_release" "argocd" {
     {
       name  = "configs.params.server\\.insecure"
       value = true
+    },
+    {
+      name  = "server.autoscaling\\.enabled"
+      value = true
+    },
+    {
+      name  = "repoServer.autoscaling\\.enabled"
+      value = true
     }
   ]
 }
