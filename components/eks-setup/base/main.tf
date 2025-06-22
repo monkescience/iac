@@ -11,6 +11,10 @@ resource "helm_release" "argocd" {
 
 
   values = [file("${path.module}/argocd-config.yaml")]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "kubernetes_secret" "argocd_git" {

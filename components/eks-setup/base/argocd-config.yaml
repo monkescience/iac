@@ -1,3 +1,5 @@
+# should match the helm values from
+# https://github.com/monkescience/gitops/blob/HEAD/apps/eu-central-1-dev/argocd.yaml
 configs:
   params:
     server:
@@ -5,19 +7,54 @@ configs:
 
 redis-ha:
   enabled: true
+  redis:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 128Mi
+      limits:
+        cpu: 400m
+        memory: 128Mi
+
+  haproxy:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+  sentinel:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 32Mi
+      limits:
+        cpu: 200m
+        memory: 32Mi
+
+  splitBrainDetection:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 32Mi
 
 controller:
-  replicas: 1
+  replicas: 2
   metrics:
     serviceMonitor:
       enabled: true
   resources:
     requests:
       cpu: 500m
-      memory: 512Mi
+      memory: 1024Mi
     limits:
-      cpu: 1000m
-      memory: 512Mi
+      cpu: 500m
+      memory: 1024Mi
 
 repoServer:
   autoscaling:
@@ -52,6 +89,7 @@ server:
       memory: 256Mi
 
 dex:
+  enabled: false
   metrics:
     enabled: true
     serviceMonitor:
