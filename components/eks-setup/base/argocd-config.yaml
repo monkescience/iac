@@ -1,5 +1,3 @@
-# should match the helm values from
-# https://github.com/monkescience/gitops/blob/HEAD/apps/eu-central-1-dev/argocd.yaml
 configs:
   params:
     server:
@@ -46,6 +44,7 @@ redis-ha:
 controller:
   replicas: 2
   metrics:
+    enabled: true
     serviceMonitor:
       enabled: true
   resources:
