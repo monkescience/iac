@@ -7,15 +7,6 @@ data "terraform_remote_state" "eks" {
   }
 }
 
-data "terraform_remote_state" "vpc" {
-  backend = "s3"
-  config = {
-    bucket = "${var.project}-${var.region}-${var.environment}-iac-tofu-state"
-    key    = "vpc/terraform.tfstate"
-    region = var.region
-  }
-}
-
 data "terraform_remote_state" "ssl_dns" {
   backend = "s3"
   config = {
@@ -36,9 +27,6 @@ module "base" {
   eks_cluster_certificate_authority_data = data.terraform_remote_state.eks.outputs.eks_cluster_certificate_authority_data
   eks_cluster_name                       = data.terraform_remote_state.eks.outputs.eks_cluster_name
   eks_cluster_oidc_issuer_url            = data.terraform_remote_state.eks.outputs.eks_cluster_oidc_issuer_url
-  eks_public_subnets                     = data.terraform_remote_state.vpc.outputs.public_subnet_ids
-  eks_vpc_id                             = data.terraform_remote_state.vpc.outputs.vpc_id
 
-  certificate_arn = data.terraform_remote_state.ssl_dns.outputs.certificate_arn
   route53_zone_id = data.terraform_remote_state.ssl_dns.outputs.route53_zone_id
 }
