@@ -12,3 +12,8 @@ output "private_subnet_ids" {
   description = "List of private subnet IDs"
   value       = [for subnet in aws_subnet.private : subnet.id]
 }
+
+output "private_subnet_cidr_blocks" {
+  description = "List of CIDR blocks for private subnets"
+  value       = [for subnet in aws_subnet.private : subnet.cidr_block]
+}

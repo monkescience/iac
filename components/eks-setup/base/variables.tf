@@ -30,7 +30,22 @@ variable "eks_cluster_oidc_issuer_url" {
   description = "The OIDC issuer URL for the EKS cluster"
 }
 
-variable "route53_hosted_zone_id" {
+variable "eks_vpc_id" {
+  description = "VPC ID where the EKS cluster is deployed"
+  type        = string
+}
+
+variable "eks_public_subnets" {
+  description = "List of public subnets of the EKS cluster"
+  type        = list(string)
+}
+
+variable "certificate_arn" {
+  description = "ARN of the SSL certificate for the EKS load balancer"
+  type        = string
+}
+
+variable "route53_zone_id" {
   type        = string
   description = "The ID of the Route 53 hosted zone where the EKS cluster will be registered"
 }

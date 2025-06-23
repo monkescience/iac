@@ -4,3 +4,12 @@ module "account_check" {
   region      = var.region
   environment = var.environment
 }
+
+module "this" {
+  source = "../../../modules/name"
+
+  project     = var.project
+  region      = var.region
+  environment = var.environment
+  name        = null
+}
