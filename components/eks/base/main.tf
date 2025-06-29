@@ -5,14 +5,22 @@ resource "aws_eks_cluster" "eks" {
 
   bootstrap_self_managed_addons = false
 
+  # enabled_cluster_log_types = [
+  #   "api",
+  #   "audit",
+  #   "authenticator",
+  #   "controllerManager",
+  #   "scheduler"
+  # ]
+
   upgrade_policy {
     support_type = "EXTENDED"
   }
 
   compute_config {
-    enabled       = true
-    node_pools    = ["general-purpose"]
-    node_role_arn = aws_iam_role.eks_node.arn
+    enabled = true
+    # node_role_arn = aws_iam_role.eks_node.arn
+    # node_pools    = ["general-purpose"]
   }
 
   kubernetes_network_config {
@@ -40,6 +48,12 @@ resource "aws_eks_cluster" "eks" {
       "79.239.60.71/32"
     ]
   }
+}
+
+resource "aws_eks_access_entry" "eks_node_class" {
+  cluster_name  = aws_eks_cluster.eks.name
+  principal_arn = aws_iam_role.eks_node.arn
+  type          = "EC2"
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_AmazonEKSBlockStoragePolicy,
@@ -47,6 +61,20 @@ resource "aws_eks_cluster" "eks" {
     aws_iam_role_policy_attachment.eks_AmazonEKSComputePolicy,
     aws_iam_role_policy_attachment.eks_AmazonEKSLoadBalancingPolicy,
     aws_iam_role_policy_attachment.eks_AmazonEKSNetworkingPolicy
+  ]
+}
+
+resource "aws_eks_access_policy_association" "example" {
+  cluster_name  = aws_eks_cluster.eks.name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAutoNodePolicy"
+  principal_arn = aws_iam_role.eks_node.arn
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [
+    aws_eks_access_entry.eks_node_class
   ]
 }
 
