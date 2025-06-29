@@ -35,3 +35,18 @@ variable "route53_zone_id" {
   description = "The ID of the Route 53 hosted zone where the EKS cluster will be registered"
 }
 
+variable "eks_node_role_name" {
+  type        = string
+  description = "The name of the IAM role for the EKS nodes"
+}
+
+variable "eks_security_group" {
+  type        = string
+  description = "The security group for the EKS cluster"
+}
+
+variable "eks_subnet_ids" {
+  type        = list(string)
+  description = "The list of subnet IDs where the EKS cluster nodes will be deployed"
+}
+

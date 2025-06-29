@@ -1,0 +1,23 @@
+apiVersion: eks.amazonaws.com/v1
+kind: NodeClass
+metadata:
+  name: custom
+  labels:
+    app.kubernetes.io/managed-by: tofu
+spec:
+  role: "${eks_node_role_name}"
+  ephemeralStorage:
+    size: 20Gi
+    iops : 3000
+    throughput: 125
+    # kmsKeyID: ""
+  snatPolicy: Random
+  networkPolicy: DefaultAllow
+  networkPolicyEventLogs: Disabled
+  subnetSelectorTerms:
+%{ for subnet_id in eks_subnet_ids ~}
+    - id: "${subnet_id}"
+%{ endfor ~}
+  securityGroupSelectorTerms:
+    - id: "${eks_security_group}"
+

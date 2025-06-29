@@ -11,7 +11,7 @@ data "terraform_remote_state" "ssl_dns" {
   backend = "s3"
   config = {
     bucket = "${var.project}-${var.region}-${var.environment}-iac-tofu-state"
-    key    = "ssl-dns/terraform.tfstate"
+    key    = "private-domain/terraform.tfstate"
     region = var.region
   }
 }
@@ -29,4 +29,8 @@ module "base" {
   eks_cluster_oidc_issuer_url            = data.terraform_remote_state.eks.outputs.eks_cluster_oidc_issuer_url
 
   route53_zone_id = data.terraform_remote_state.ssl_dns.outputs.route53_zone_id
+
+  eks_node_role_name = data.terraform_remote_state.eks.outputs.eks_node_role_name
+  eks_security_group = data.terraform_remote_state.eks.outputs.eks_security_group
+  eks_subnet_ids     = data.terraform_remote_state.eks.outputs.eks_subnet_ids
 }

@@ -1,3 +1,18 @@
+# Karpenter resources
+resource "kubectl_manifest" "eks_node_class" {
+  yaml_body = templatefile("${path.module}/eks-node-class.yaml", {
+    region             = var.region
+    environment        = var.environment
+    eks_node_role_name = var.eks_node_role_name
+    eks_security_group = var.eks_security_group
+    eks_subnet_ids     = var.eks_subnet_ids
+  })
+}
+
+resource "kubectl_manifest" "eks_node_pool" {
+  yaml_body = file("${path.module}/eks-node-pool.yaml")
+}
+
 # ArgoCD Resources
 resource "helm_release" "argocd" {
   name             = "argocd"
@@ -15,6 +30,11 @@ resource "helm_release" "argocd" {
   lifecycle {
     ignore_changes = all
   }
+
+  depends_on = [
+    kubectl_manifest.eks_node_class,
+    kubectl_manifest.eks_node_pool
+  ]
 }
 
 resource "kubernetes_secret" "argocd_git" {
@@ -39,34 +59,9 @@ resource "kubernetes_secret" "argocd_git" {
 }
 
 resource "kubectl_manifest" "argocd_root_app" {
-  yaml_body = yamlencode({
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "Application"
-    metadata = {
-      name      = "${var.region}-${var.environment}"
-      namespace = "argocd"
-      finalizers = [
-        "resources-finalizer.argocd.argoproj.io"
-      ]
-    }
-    spec = {
-      project = "default"
-      source = {
-        repoURL        = "https://github.com/monkescience/gitops"
-        targetRevision = "HEAD"
-        path           = "apps/${var.region}-${var.environment}"
-      }
-      destination = {
-        server    = "https://kubernetes.default.svc"
-        namespace = "argocd"
-      }
-      syncPolicy = {
-        automated = {
-          prune    = true
-          selfHeal = true
-        }
-      }
-    }
+  yaml_body = templatefile("${path.module}/argocd-root-app.yaml", {
+    region      = var.region
+    environment = var.environment
   })
 
   depends_on = [
