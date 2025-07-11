@@ -53,3 +53,37 @@ resource "aws_s3_bucket_lifecycle_configuration" "state" {
     }
   }
 }
+
+data "aws_iam_policy_document" "state_deny_unencrypted_s3_access" {
+  version = "2012-10-17"
+
+  statement {
+    effect = "Deny"
+    sid    = "DenyUnencryptedS3Access"
+    actions = [
+      "s3:*"
+    ]
+    resources = [
+      aws_s3_bucket.state.arn,
+      "${aws_s3_bucket.state.arn}/*"
+    ]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test = "Bool"
+      values = [
+        "false"
+      ]
+      variable = "aws:SecureTransport"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "state" {
+  bucket = aws_s3_bucket.state.id
+  policy = data.aws_iam_policy_document.state_deny_unencrypted_s3_access.json
+}
