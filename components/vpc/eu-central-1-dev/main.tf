@@ -20,4 +20,6 @@ module "base" {
   enable_fck_nat = false
   # $$$
   enable_nat_gateways = false
+  # $$$$
+  enable_ecr_vpc_endpoints = false
 }

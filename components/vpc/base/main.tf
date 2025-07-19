@@ -271,3 +271,68 @@ resource "aws_route_table_association" "private_nat_gateway" {
   subnet_id      = each.value.id
   route_table_id = aws_route_table.private_nat_gateway[local.availability_zone_to_public_subnets_map[each.value.availability_zone]].id
 }
+
+# ECR VPC Endpoints
+resource "aws_security_group" "ecr_vpc_endpoints" {
+  count = var.enable_ecr_vpc_endpoints ? 1 : 0
+
+  name   = "${module.vpc_name.name}-ecr-endpoints"
+  vpc_id = aws_vpc.vpc.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_vpc_endpoint" "ecr_dkr" {
+  count = var.enable_ecr_vpc_endpoints ? 1 : 0
+
+  vpc_id              = aws_vpc.vpc.id
+  service_name        = "com.amazonaws.${var.region}.ecr.dkr"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+  subnet_ids          = [for subnet in aws_subnet.private : subnet.id]
+  security_group_ids  = [aws_security_group.ecr_vpc_endpoints[0].id]
+
+  tags = {
+    "Name" = "${module.vpc_name.name}-ecr-dkr"
+  }
+}
+
+resource "aws_vpc_endpoint" "ecr_api" {
+  count = var.enable_ecr_vpc_endpoints ? 1 : 0
+
+  vpc_id              = aws_vpc.vpc.id
+  service_name        = "com.amazonaws.${var.region}.ecr.api"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+  subnet_ids          = [for subnet in aws_subnet.private : subnet.id]
+  security_group_ids  = [aws_security_group.ecr_vpc_endpoints[0].id]
+
+  tags = {
+    Name = "${module.vpc_name.name}-ecr-api"
+  }
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  count = var.enable_ecr_vpc_endpoints ? 1 : 0
+
+  vpc_id            = aws_vpc.vpc.id
+  service_name      = "com.amazonaws.${var.region}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = [aws_default_route_table.vpc.id]
+
+  tags = {
+    Name = "${module.vpc_name.name}-s3"
+  }
+}
