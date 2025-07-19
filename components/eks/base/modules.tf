@@ -5,7 +5,7 @@ module "account_check" {
   environment = var.environment
 }
 
-module "eks_name" {
+module "this" {
   source = "../../../modules/name"
 
   project     = var.project

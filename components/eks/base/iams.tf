@@ -1,6 +1,6 @@
 # EKS Cluster IAM Role
 resource "aws_iam_role" "eks" {
-  name               = "${module.eks_name.name}-eks-role"
+  name               = "${module.this.name}-eks-role"
   assume_role_policy = data.aws_iam_policy_document.eks_assume_role_policy.json
 }
 
@@ -51,7 +51,7 @@ resource "aws_iam_role_policy_attachment" "eks_AmazonEKSNetworkingPolicy" {
 
 # EKS Node IAM Role
 resource "aws_iam_role" "eks_node" {
-  name               = "${module.eks_name.name}-eks-node-role"
+  name               = "${module.this.name}-eks-node-role"
   assume_role_policy = data.aws_iam_policy_document.eks_node_assume_role_policy.json
 }
 
