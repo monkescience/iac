@@ -1,0 +1,68 @@
+data "aws_iam_policy_document" "mirror_assume_role" {
+  version = "2012-10-17"
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRoleWithWebIdentity",
+      "sts:TagSession"
+    ]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${var.github_domain}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "${var.github_domain}:sub"
+      values = [
+        "repo:${var.mirror_github_repository}:*",
+      ]
+    }
+  }
+}
+
+resource "aws_iam_role" "mirror" {
+  name               = "${module.this.name}-mirror"
+  assume_role_policy = data.aws_iam_policy_document.mirror_assume_role.json
+}
+
+data "aws_iam_policy_document" "mirror" {
+  version = "2012-10-17"
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecr:GetAuthorizationToken"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:PutImage",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload"
+    ]
+    resources = [
+      for repository in var.mirror_ecr_repository_arns : repository
+    ]
+  }
+
+}
+
+resource "aws_iam_role_policy" "mirror" {
+  name   = "AllowECRAccess"
+  role   = aws_iam_role.mirror.id
+  policy = data.aws_iam_policy_document.mirror.json
+}
