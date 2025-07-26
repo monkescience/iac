@@ -1,4 +1,6 @@
 data "aws_iam_policy_document" "mirror_assume_role" {
+  count = var.mirror_enabled ? 1 : 0
+
   version = "2012-10-17"
 
   statement {
@@ -30,11 +32,15 @@ data "aws_iam_policy_document" "mirror_assume_role" {
 }
 
 resource "aws_iam_role" "mirror" {
+  count = var.mirror_enabled ? 1 : 0
+
   name               = "${module.this.name}-mirror"
-  assume_role_policy = data.aws_iam_policy_document.mirror_assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.mirror_assume_role[0].json
 }
 
 data "aws_iam_policy_document" "mirror" {
+  count = var.mirror_enabled ? 1 : 0
+
   version = "2012-10-17"
 
   statement {
@@ -62,7 +68,9 @@ data "aws_iam_policy_document" "mirror" {
 }
 
 resource "aws_iam_role_policy" "mirror" {
+  count = var.mirror_enabled ? 1 : 0
+
   name   = "AllowECRAccess"
-  role   = aws_iam_role.mirror.id
-  policy = data.aws_iam_policy_document.mirror.json
+  role   = aws_iam_role.mirror[0].id
+  policy = data.aws_iam_policy_document.mirror[0].json
 }
