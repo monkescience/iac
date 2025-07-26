@@ -111,6 +111,22 @@ resource "aws_ecr_pull_through_cache_rule" "gitlab" {
 data "aws_ecr_lifecycle_policy_document" "template" {
   rule {
     priority    = 1
+    description = "Remove untagged images after 7 days"
+
+    selection {
+      count_number = 7
+      count_type   = "sinceImagePushed"
+      count_unit   = "days"
+      tag_status   = "untagged"
+    }
+
+    action {
+      type = "expire"
+    }
+  }
+
+  rule {
+    priority    = 2
     description = "Keep only the latest 2 images from the upstream registry"
 
     selection {

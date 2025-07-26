@@ -17,6 +17,22 @@ resource "aws_ecr_repository" "ecr_repository" {
 data "aws_ecr_lifecycle_policy_document" "lifecycle_policy_document" {
   rule {
     priority    = 1
+    description = "Remove untagged images after 7 days"
+
+    selection {
+      count_number = 7
+      count_type   = "sinceImagePushed"
+      count_unit   = "days"
+      tag_status   = "untagged"
+    }
+
+    action {
+      type = "expire"
+    }
+  }
+
+  rule {
+    priority    = 2
     description = "Keep only the 4 most recent images for this repository"
 
     selection {
