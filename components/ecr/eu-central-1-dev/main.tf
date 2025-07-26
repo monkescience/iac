@@ -5,12 +5,7 @@ module "base" {
   environment = var.environment
   project     = var.project
 
-  ecr_repositories = {
-    "argoproj/argocd" = {
-      repository_type = "mirror"
-    },
-    "monkescience/reference-service-go" = {
-      repository_type = "private"
-    }
-  }
+  ecr_repositories = [
+    "monkescience/reference-service-go"
+  ]
 }
