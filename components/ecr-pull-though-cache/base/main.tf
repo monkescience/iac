@@ -6,6 +6,14 @@ resource "aws_ecr_pull_through_cache_rule" "quay" {
   upstream_registry_url = "quay.io"
 }
 
+# Amazon ECR Public
+resource "aws_ecr_pull_through_cache_rule" "ecr_public" {
+  count = var.enable_ecr_public_pull_through_cache ? 1 : 0
+
+  ecr_repository_prefix = "ecr-public"
+  upstream_registry_url = "public.ecr.aws"
+}
+
 # GitHub Container Registry
 resource "aws_secretsmanager_secret" "github" {
   count = var.enable_github_pull_through_cache ? 1 : 0
