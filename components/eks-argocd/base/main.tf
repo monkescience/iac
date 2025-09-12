@@ -9,7 +9,7 @@ resource "helm_release" "argocd" {
   chart            = "argo-cd"
   namespace        = "argocd"
   create_namespace = true
-  version          = "8.3.4"
+  version          = "8.3.6"
   wait             = true
   timeout          = 600
 
