@@ -128,7 +128,7 @@ resource "aws_subnet" "private" {
   }
 }
 
-# FCK NAT Gateway resources - can be enabled/disabled with var.enable_fck_nat
+# FCK NAT Gateway resources
 resource "aws_security_group" "fck_nat" {
   count = var.enable_fck_nat ? 1 : 0
 
@@ -192,9 +192,8 @@ resource "aws_instance" "private_fck_nat" {
   ami           = data.aws_ami.amazon_linux_2[0].id
   instance_type = "t4g.nano"
 
-  network_interface {
+  primary_network_interface {
     network_interface_id = each.value.id
-    device_index         = 0
   }
 
   tags = {
@@ -224,7 +223,7 @@ resource "aws_route_table_association" "private_fck_nat" {
   route_table_id = aws_route_table.private_fck_nat[local.availability_zone_to_public_subnets_map[each.value.availability_zone]].id
 }
 
-# NAT Gateway resources - can be enabled/disabled with var.enable_nat_gateways
+# NAT Gateway resources
 resource "aws_eip" "private_nat_gateway" {
   for_each = var.enable_nat_gateways ? aws_subnet.public : {}
 
