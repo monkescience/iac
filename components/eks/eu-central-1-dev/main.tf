@@ -19,4 +19,7 @@ module "base" {
   eks_cluster_admin_principal_arns = [
     "arn:aws:iam::387105013966:role/aws-reserved/sso.amazonaws.com/eu-central-1/AWSReservedSSO_admin_dc1b034f828d678b",
   ]
+  eks_public_access_cidrs = [
+    "62.224.83.150/32"
+  ]
 }
