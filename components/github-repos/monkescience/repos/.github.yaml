@@ -1,0 +1,6 @@
+name: .github
+
+visibility: public
+
+features:
+  issues: false
