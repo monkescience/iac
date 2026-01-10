@@ -1,7 +1,11 @@
 # Default settings applied to all repositories unless overridden.
-name: ""
 description: ""
 visibility: private
+homepage_url: null
+topics: []
+archived: false
+auto_init: true
+license_template: mit
 
 features:
   issues: true
@@ -28,3 +32,5 @@ branch_protection:
 
 enable_branch_protection: true
 enable_branch_ruleset: true
+enable_conventional_commits_ruleset: true
+enable_branch_naming_ruleset: true

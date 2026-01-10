@@ -24,16 +24,16 @@ locals {
 resource "github_repository" "repository" {
   for_each = local.repositories
 
-  name        = each.value.name
-  description = lookup(each.value, "description", "")
-  visibility  = lookup(each.value, "visibility", "private")
+  name        = each.key
+  description = each.value.description
+  visibility  = each.value.visibility
 
-  auto_init        = lookup(each.value, "auto_init", true)
-  license_template = lookup(each.value, "license_template", "mit")
+  auto_init        = each.value.auto_init
+  license_template = each.value.license_template
 
-  homepage_url = lookup(each.value, "homepage_url", null)
-  topics       = lookup(each.value, "topics", [])
-  archived     = lookup(each.value, "archived", false)
+  homepage_url = each.value.homepage_url
+  topics       = each.value.topics
+  archived     = each.value.archived
 
   has_issues      = each.value.features.issues
   has_wiki        = each.value.features.wiki
@@ -51,23 +51,23 @@ resource "github_repository" "repository" {
   squash_merge_commit_title   = each.value.merge_options.squash_merge_commit_title
   squash_merge_commit_message = each.value.merge_options.squash_merge_commit_message
 
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "github_branch_default" "default_branch" {
   for_each = local.repositories
 
   repository = github_repository.repository[each.key].name
-  branch     = lookup(each.value, "default_branch", "main")
+  branch     = each.value.default_branch
 }
 
 resource "github_branch_protection" "default_branch" {
   for_each = { for k, v in local.repositories : k => v if v.enable_branch_protection }
 
   repository_id = github_repository.repository[each.key].node_id
-  pattern       = lookup(each.value, "default_branch", "main")
+  pattern       = each.value.default_branch
 
   required_pull_request_reviews {
     required_approving_review_count = each.value.branch_protection.required_approving_review_count
@@ -119,10 +119,57 @@ resource "github_repository_ruleset" "branch_protection" {
       require_last_push_approval        = false
       required_review_thread_resolution = true
     }
+  }
+}
 
+resource "github_repository_ruleset" "conventional_commits" {
+  for_each = { for k, v in local.repositories : k => v if v.enable_conventional_commits_ruleset }
+
+  name        = "conventional-commits"
+  repository  = github_repository.repository[each.key].name
+  target      = "branch"
+  enforcement = "active"
+
+  bypass_actors {
+    actor_type  = "OrganizationAdmin"
+    actor_id    = 0
+    bypass_mode = "always"
+  }
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
     commit_message_pattern {
       operator = "starts_with"
       pattern  = "(feat|fix|docs|style|refactor|test|chore|build|ci|perf|revert)(\\(.+\\))?:"
+    }
+  }
+}
+
+resource "github_repository_ruleset" "branch_naming" {
+  for_each = { for k, v in local.repositories : k => v if v.enable_branch_naming_ruleset }
+
+  name        = "branch-naming"
+  repository  = github_repository.repository[each.key].name
+  target      = "branch"
+  enforcement = "active"
+
+  conditions {
+    ref_name {
+      include = ["~ALL"]
+      exclude = ["~DEFAULT_BRANCH", "refs/heads/renovate/*", "refs/heads/release-please--*"]
+    }
+  }
+
+  rules {
+    branch_name_pattern {
+      operator = "regex"
+      pattern  = "^(feat|fix|chore|docs|refactor|test|ci|build|perf|style|revert)/[a-z0-9-]+$"
     }
   }
 }
