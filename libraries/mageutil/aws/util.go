@@ -1,4 +1,4 @@
-package tofu
+package aws
 
 import (
 	"os"

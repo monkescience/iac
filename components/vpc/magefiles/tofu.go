@@ -5,5 +5,5 @@ package main
 
 import (
 	//mage:import
-	_ "root/libraries/mageutil/tofu"
+	_ "root/libraries/mageutil/aws"
 )
