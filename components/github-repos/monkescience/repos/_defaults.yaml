@@ -29,7 +29,7 @@ default_branch: main
 branch_protection:
   required_approving_review_count: 0
   required_status_checks: []
-  strict_required_status_checks: true
+  strict_required_status_checks: false
 
 enable_branch_protection: true
 enable_branch_ruleset: true
