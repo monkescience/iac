@@ -1,6 +1,10 @@
 # ArgoCD Resources
 data "http" "argocd_config" {
-  url = "https://raw.githubusercontent.com/monkescience/gitops/refs/heads/main/manifests/argocd/eu-central-1-dev/values.yaml"
+  url = "https://raw.githubusercontent.com/monkescience/gitops/refs/heads/main/manifests/argocd/${var.region}-${var.environment}/values.yaml"
+}
+
+data "http" "argocd_root_app" {
+  url = "https://raw.githubusercontent.com/monkescience/gitops/refs/heads/main/apps/${var.region}-${var.environment}.yaml"
 }
 
 resource "helm_release" "argocd" {
@@ -42,10 +46,7 @@ resource "kubernetes_secret" "argocd_git" {
 }
 
 resource "kubectl_manifest" "argocd_root_app" {
-  yaml_body = templatefile("${path.module}/argocd-root-app.yaml", {
-    region      = var.region
-    environment = var.environment
-  })
+  yaml_body = data.http.argocd_root_app.response_body
 
   depends_on = [
     helm_release.argocd,
