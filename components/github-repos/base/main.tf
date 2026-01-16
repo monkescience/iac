@@ -119,6 +119,19 @@ resource "github_repository_ruleset" "branch_protection" {
       require_last_push_approval        = false
       required_review_thread_resolution = true
     }
+
+    dynamic "required_status_checks" {
+      for_each = length(each.value.branch_protection.required_status_checks) > 0 ? [1] : []
+      content {
+        strict_required_status_checks_policy = each.value.branch_protection.strict_required_status_checks
+        dynamic "required_check" {
+          for_each = each.value.branch_protection.required_status_checks
+          content {
+            context = required_check.value
+          }
+        }
+      }
+    }
   }
 }
 
