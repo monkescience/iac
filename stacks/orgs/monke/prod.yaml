@@ -1,5 +1,5 @@
 import:
-  - catalog/bootstrap
+  - catalog/aws/bootstrap
 
 vars:
   namespace: monke

@@ -1,0 +1,13 @@
+components:
+  terraform:
+    aws/ecr:
+      metadata:
+        component: aws/ecr
+        terraform_workspace: default
+      backend:
+        s3:
+          key: ecr/terraform.tfstate
+      vars:
+        component: ecr
+        ecr_repositories:
+          - monkescience/reference-service-go

@@ -1,0 +1,11 @@
+components:
+  terraform:
+    aws/bootstrap:
+      metadata:
+        component: aws/bootstrap
+        terraform_workspace: default
+      backend:
+        s3:
+          key: bootstrap/terraform.tfstate
+      vars:
+        component: bootstrap

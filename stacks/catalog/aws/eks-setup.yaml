@@ -1,0 +1,12 @@
+components:
+  terraform:
+    aws/eks-setup:
+      metadata:
+        component: aws/eks-setup
+        terraform_workspace: default
+      backend:
+        s3:
+          key: eks-setup/terraform.tfstate
+      vars:
+        component: eks-setup
+        route53_zone_id: ""

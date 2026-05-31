@@ -1,0 +1,11 @@
+components:
+  terraform:
+    aws/sso:
+      metadata:
+        component: aws/sso
+        terraform_workspace: default
+      backend:
+        s3:
+          key: sso/terraform.tfstate
+      vars:
+        component: sso

@@ -1,8 +1,8 @@
 import:
-  - catalog/bootstrap
-  - catalog/cognito
-  - catalog/organization
-  - catalog/sso
+  - catalog/aws/bootstrap
+  - catalog/aws/cognito
+  - catalog/aws/organization
+  - catalog/aws/sso
 
 vars:
   namespace: monke

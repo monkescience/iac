@@ -1,0 +1,11 @@
+components:
+  terraform:
+    aws/private-domain:
+      metadata:
+        component: aws/private-domain
+        terraform_workspace: default
+      backend:
+        s3:
+          key: private-domain/terraform.tfstate
+      vars:
+        component: private-domain

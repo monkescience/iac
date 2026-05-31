@@ -7,8 +7,8 @@
 *.terraform.tfvars.json
 backend.tf.json
 
-# github-repositories keeps a committed local state (no secrets)
-!components/terraform/github-repositories/terraform.tfstate
+# github/repositories keeps a committed local state (no secrets)
+!components/terraform/github/repositories/terraform.tfstate
 
 # IntelliJ IDEA
 .idea

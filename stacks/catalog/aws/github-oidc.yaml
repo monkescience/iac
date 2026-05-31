@@ -1,0 +1,15 @@
+components:
+  terraform:
+    aws/github-oidc:
+      metadata:
+        component: aws/github-oidc
+        terraform_workspace: default
+      backend:
+        s3:
+          key: github-oidc/terraform.tfstate
+      vars:
+        component: github-oidc
+        github_domain: token.actions.githubusercontent.com
+        mirror_enabled: false
+        mirror_github_repository: monkescience/mirror
+        mirror_ecr_repository_arns: []

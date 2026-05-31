@@ -1,5 +1,5 @@
 import:
-  - catalog/github-repositories
+  - catalog/github/repositories
 
 vars:
   namespace: monkescience

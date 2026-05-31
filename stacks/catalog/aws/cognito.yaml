@@ -1,0 +1,11 @@
+components:
+  terraform:
+    aws/cognito:
+      metadata:
+        component: aws/cognito
+        terraform_workspace: default
+      backend:
+        s3:
+          key: cognito/terraform.tfstate
+      vars:
+        component: cognito

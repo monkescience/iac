@@ -1,16 +1,16 @@
 import:
-  - catalog/api-gateway
-  - catalog/bootstrap
-  - catalog/ecr
-  - catalog/ecr-pull-though-cache
-  - catalog/eks
-  - catalog/eks-argocd
-  - catalog/eks-setup
-  - catalog/github
-  - catalog/private-domain
-  - catalog/secret
-  - catalog/vpc
-  - catalog/vpn
+  - catalog/aws/api-gateway
+  - catalog/aws/bootstrap
+  - catalog/aws/ecr
+  - catalog/aws/ecr-pull-though-cache
+  - catalog/aws/eks
+  - catalog/aws/eks-argocd
+  - catalog/aws/eks-setup
+  - catalog/aws/github-oidc
+  - catalog/aws/private-domain
+  - catalog/aws/secret
+  - catalog/aws/vpc
+  - catalog/aws/vpn
 
 vars:
   namespace: monke

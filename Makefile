@@ -43,8 +43,9 @@ fmt: ## Format all OpenTofu files
 	tofu fmt -recursive $(TF_DIRS)
 
 .PHONY: lint
-lint: ## Lint OpenTofu components with tflint
+lint: ## Lint OpenTofu components and modules with tflint
 	tflint --recursive --chdir=components/terraform
+	tflint --recursive --chdir=modules
 
 guard-%:
 	@if [ -z '$($*)' ]; then echo "Missing required variable: $*"; exit 1; fi
