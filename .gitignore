@@ -7,7 +7,7 @@
 *.terraform.tfvars.json
 backend.tf.json
 
-# github-repositories keeps a committed local state (no secrets; works without the AWS bootstrap)
+# github-repositories keeps a committed local state (no secrets)
 !components/terraform/github-repositories/terraform.tfstate
 
 # IntelliJ IDEA
