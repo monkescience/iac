@@ -43,8 +43,6 @@ resource "github_repository" "repository" {
   has_projects    = each.value.features.projects
   has_discussions = each.value.features.discussions
 
-  vulnerability_alerts = each.value.features.vulnerability_alerts
-
   security_and_analysis {
     secret_scanning {
       status = each.value.security_and_analysis.secret_scanning
@@ -178,6 +176,13 @@ resource "github_repository_dependabot_security_updates" "security_updates" {
 
   repository = github_repository.repository[each.key].name
   enabled    = true
+}
+
+resource "github_repository_vulnerability_alerts" "vulnerability_alerts" {
+  for_each = local.repositories
+
+  repository = github_repository.repository[each.key].name
+  enabled    = each.value.features.vulnerability_alerts
 }
 
 resource "github_actions_repository_access_level" "access_level" {
