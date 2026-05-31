@@ -14,3 +14,5 @@ branch_protection:
   required_status_checks:
     - test
     - lint
+    - tidy
+    - build
