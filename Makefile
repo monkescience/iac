@@ -50,15 +50,15 @@ guard-%:
 	@if [ -z '$($*)' ]; then echo "Missing required variable: $*"; exit 1; fi
 
 .PHONY: plan
-plan: guard-COMPONENT guard-STACK ## Plan a component in a stack (COMPONENT= STACK=)
+plan: guard-COMPONENT guard-STACK ## Plan a component and save a plan file (COMPONENT= STACK=)
 	atmos terraform plan $(COMPONENT) -s $(STACK)
 
 .PHONY: apply
-apply: guard-COMPONENT guard-STACK ## Apply a component in a stack
-	atmos terraform apply $(COMPONENT) -s $(STACK)
+apply: guard-COMPONENT guard-STACK ## Apply the plan file from `make plan` (no re-plan, no prompt)
+	atmos terraform apply $(COMPONENT) -s $(STACK) --planfile $(STACK)-$(COMPONENT).planfile
 
 .PHONY: deploy
-deploy: guard-COMPONENT guard-STACK ## Plan + apply a component in a stack
+deploy: guard-COMPONENT guard-STACK ## Plan + apply in one shot, auto-approved (skips the review step)
 	atmos terraform deploy $(COMPONENT) -s $(STACK)
 
 .PHONY: destroy
