@@ -1,0 +1,11 @@
+components:
+  terraform:
+    vpn:
+      metadata:
+        component: vpn
+        terraform_workspace: default
+      backend:
+        s3:
+          key: vpn/terraform.tfstate
+      vars:
+        component: vpn

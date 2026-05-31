@@ -1,0 +1,51 @@
+# Default settings applied to all repositories unless overridden.
+description: ""
+visibility: private
+homepage_url: null
+topics: []
+archived: false
+archive_on_destroy: true
+auto_init: true
+license_template: mit
+
+features:
+  issues: true
+  wiki: false
+  projects: false
+  discussions: false
+  vulnerability_alerts: true
+  dependabot_security_updates: true
+
+merge_options:
+  allow_merge_commit: false
+  allow_squash_merge: true
+  allow_rebase_merge: true
+  delete_branch_on_merge: true
+  allow_auto_merge: true
+  allow_update_branch: true
+  squash_merge_commit_title: PR_TITLE
+  squash_merge_commit_message: BLANK
+
+default_branch: main
+
+branch_protection:
+  required_approving_review_count: 0
+  required_status_checks: []
+  strict_required_status_checks: false
+  required_code_scanning: []
+
+security_and_analysis:
+  secret_scanning: enabled
+  secret_scanning_push_protection: enabled
+
+workflow_permissions:
+  default_permissions: read
+  can_approve_pull_request_reviews: false
+
+actions_access_level: organization
+
+enable_branch_ruleset: true
+enable_conventional_commits_ruleset: true
+enable_branch_naming_ruleset: true
+enable_tag_protection_ruleset: true
+enable_push_ruleset: true

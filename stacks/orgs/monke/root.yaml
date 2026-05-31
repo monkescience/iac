@@ -1,0 +1,22 @@
+import:
+  - catalog/bootstrap
+  - catalog/cognito
+  - catalog/organization
+  - catalog/sso
+
+vars:
+  namespace: monke
+  tenant: core
+  environment: root
+  stage: root
+  project: monke
+  region: eu-central-1
+
+terraform:
+  backend_type: s3
+  backend:
+    s3:
+      bucket: monke-eu-central-1-root-iac-tofu-state
+      region: eu-central-1
+      encrypt: true
+      use_lockfile: true

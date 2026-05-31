@@ -1,0 +1,14 @@
+visibility: public
+description: Focused observability dashboards for metrics, logs, and traces
+
+topics:
+  - observability
+  - dashboards
+  - prometheus
+  - metrics
+  - perses
+
+branch_protection:
+  required_status_checks:
+    - test
+    - lint

@@ -1,0 +1,16 @@
+visibility: public
+description: Automate releases based on conventional commits
+
+topics:
+  - cli
+  - go
+  - release-automation
+  - conventional-commits
+  - changelog
+  - semver
+  - calver
+
+branch_protection:
+  required_status_checks:
+    - test
+    - lint

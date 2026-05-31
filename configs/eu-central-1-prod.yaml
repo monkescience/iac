@@ -1,6 +1,0 @@
-project: monke
-
-s3_backend:
-  bucket: monke-eu-central-1-prod-iac-tofu-state
-  encrypt: true
-  use_lockfile: true

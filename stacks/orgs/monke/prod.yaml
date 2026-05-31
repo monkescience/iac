@@ -1,0 +1,19 @@
+import:
+  - catalog/bootstrap
+
+vars:
+  namespace: monke
+  tenant: core
+  environment: prod
+  stage: prod
+  project: monke
+  region: eu-central-1
+
+terraform:
+  backend_type: s3
+  backend:
+    s3:
+      bucket: monke-eu-central-1-prod-iac-tofu-state
+      region: eu-central-1
+      encrypt: true
+      use_lockfile: true

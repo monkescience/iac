@@ -1,0 +1,11 @@
+components:
+  terraform:
+    eks-argocd:
+      metadata:
+        component: eks-argocd
+        terraform_workspace: default
+      backend:
+        s3:
+          key: eks-argocd/terraform.tfstate
+      vars:
+        component: eks-argocd

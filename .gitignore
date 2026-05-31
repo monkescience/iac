@@ -3,6 +3,9 @@
 .terraform.lock.hcl
 *terraform.tfstate*
 *terraform.tfplan*
+*.planfile
+*.terraform.tfvars.json
+backend.tf.json
 
 # IntelliJ IDEA
 .idea

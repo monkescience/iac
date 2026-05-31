@@ -1,0 +1,7 @@
+visibility: private
+
+enable_branch_ruleset: false
+enable_conventional_commits_ruleset: false
+enable_branch_naming_ruleset: false
+enable_tag_protection_ruleset: false
+enable_push_ruleset: false

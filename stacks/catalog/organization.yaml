@@ -1,0 +1,11 @@
+components:
+  terraform:
+    organization:
+      metadata:
+        component: organization
+        terraform_workspace: default
+      backend:
+        s3:
+          key: organization/terraform.tfstate
+      vars:
+        component: organization

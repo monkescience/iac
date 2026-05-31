@@ -1,0 +1,11 @@
+components:
+  terraform:
+    github-repositories:
+      metadata:
+        component: github-repositories
+      backend_type: local
+      backend:
+        local:
+          path: terraform.tfstate
+      vars:
+        owner: monkescience

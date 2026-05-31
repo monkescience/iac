@@ -1,0 +1,14 @@
+visibility: public
+description: "HTTP server utilities for Go: graceful shutdown, health checks, RFC 9457 problem details, and context-aware slog"
+
+topics:
+  - go
+  - http
+  - slog
+  - health-check
+  - graceful-shutdown
+
+branch_protection:
+  required_status_checks:
+    - test
+    - lint

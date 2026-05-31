@@ -1,0 +1,10 @@
+visibility: public
+description: Homebrew tap for monkescience projects
+
+topics:
+  - homebrew
+  - homebrew-tap
+
+branch_protection:
+  required_status_checks:
+    - cask-audit

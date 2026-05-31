@@ -1,0 +1,15 @@
+components:
+  terraform:
+    github:
+      metadata:
+        component: github
+        terraform_workspace: default
+      backend:
+        s3:
+          key: github/terraform.tfstate
+      vars:
+        component: github
+        github_domain: token.actions.githubusercontent.com
+        mirror_enabled: false
+        mirror_github_repository: monkescience/mirror
+        mirror_ecr_repository_arns: []

@@ -1,0 +1,160 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - openvpn
+  - easy-rsa
+  - iptables-persistent
+
+write_files:
+  - path: /etc/sysctl.d/99-openvpn.conf
+    permissions: '0644'
+    content: |
+      net.ipv4.ip_forward = 1
+      net.ipv6.conf.all.forwarding = 1
+
+  - path: /usr/local/bin/setup-openvpn.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      set -e
+
+      # Create OpenVPN directory structure
+      mkdir -p /etc/openvpn/server
+      mkdir -p /etc/openvpn/client
+      chmod 700 /etc/openvpn
+
+      # Set up Easy-RSA
+      cd /etc/openvpn
+      cp -r /usr/share/easy-rsa .
+      cd easy-rsa
+
+      # Initialize PKI
+      ./easyrsa init-pki
+      echo "OpenVPN-Server" | ./easyrsa build-ca nopass
+      ./easyrsa gen-req server nopass
+      ./easyrsa sign-req server server
+      ./easyrsa gen-dh
+      openvpn --genkey secret ta.key
+
+      # Copy certificates to OpenVPN directory
+      cp pki/ca.crt /etc/openvpn/server/
+      cp pki/issued/server.crt /etc/openvpn/server/
+      cp pki/private/server.key /etc/openvpn/server/
+      cp pki/dh.pem /etc/openvpn/server/
+      cp ta.key /etc/openvpn/server/
+
+      # Create server configuration
+      cat > /etc/openvpn/server/server.conf << EOL
+      port 1194
+      proto udp
+      dev tun
+      ca ca.crt
+      cert server.crt
+      key server.key
+      dh dh.pem
+      auth SHA512
+      tls-crypt ta.key
+      topology subnet
+      server 10.20.30.0 255.255.255.0
+      ifconfig-pool-persist /var/log/openvpn/ipp.txt
+      push "redirect-gateway def1 bypass-dhcp"
+      push "dhcp-option DNS 8.8.8.8"
+      push "dhcp-option DNS 8.8.4.4"
+      keepalive 10 120
+      cipher AES-256-GCM
+      user nobody
+      group nogroup
+      persist-key
+      persist-tun
+      verb 3
+      explicit-exit-notify 1
+      EOL
+
+      # Set up iptables rules for NAT
+      iptables -t nat -A POSTROUTING -s 10.20.30.0/24 -o eth0 -j MASQUERADE
+      iptables -A INPUT -i tun0 -j ACCEPT
+      iptables -A FORWARD -i tun0 -j ACCEPT
+      iptables -A FORWARD -i tun0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+      iptables -A FORWARD -i eth0 -o tun0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+      # Save iptables rules
+      iptables-save > /etc/iptables/rules.v4
+
+      # Create log directory
+      mkdir -p /var/log/openvpn
+
+      # Enable and start OpenVPN service
+      systemctl enable openvpn-server@server
+      systemctl start openvpn-server@server
+
+      # Log completion
+      echo "OpenVPN setup completed at $(date)" >> /var/log/openvpn-setup.log
+
+  - path: /usr/local/bin/create-client-config.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      # Script to create client configuration
+      CLIENT_NAME=${1:-client1}
+
+      cd /etc/openvpn/easy-rsa
+
+      # Generate client certificate
+      ./easyrsa gen-req $CLIENT_NAME nopass
+      ./easyrsa sign-req client $CLIENT_NAME
+
+      # Get server public IP
+      SERVER_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+
+      # Create client config
+      cat > /etc/openvpn/client/$CLIENT_NAME.ovpn << EOL
+      client
+      dev tun
+      proto udp
+      remote $SERVER_IP 1194
+      resolv-retry infinite
+      nobind
+      persist-key
+      persist-tun
+      auth SHA512
+      cipher AES-256-GCM
+      ignore-unknown-option block-outside-dns
+      block-outside-dns
+      verb 3
+      <ca>
+      $(cat /etc/openvpn/server/ca.crt)
+      </ca>
+      <cert>
+      $(cat pki/issued/$CLIENT_NAME.crt)
+      </cert>
+      <key>
+      $(cat pki/private/$CLIENT_NAME.key)
+      </key>
+      <tls-crypt>
+      $(cat /etc/openvpn/server/ta.key)
+      </tls-crypt>
+      EOL
+
+      echo "Client configuration created: /etc/openvpn/client/$CLIENT_NAME.ovpn"
+
+  - path: /usr/local/bin/show-client-config
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      # Display available client configurations
+      echo "Available OpenVPN client configurations:"
+      ls -la /etc/openvpn/client/*.ovpn 2>/dev/null || echo "No client configurations found."
+      echo ""
+      echo "To create a new client config, run:"
+      echo "/usr/local/bin/create-client-config.sh [client-name]"
+      echo ""
+      echo "Server IP: $(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
+
+runcmd:
+  - sysctl -p /etc/sysctl.d/99-openvpn.conf
+  - /usr/local/bin/setup-openvpn.sh
+  - /usr/local/bin/create-client-config.sh client1
+
+final_message: "OpenVPN server setup completed successfully!"

@@ -1,0 +1,13 @@
+visibility: public
+description: Go testing toolkit with structured document comparison (JSON, YAML, HTML) and expressive assertions
+
+topics:
+  - go
+  - testing
+  - assertions
+  - golden-files
+
+branch_protection:
+  required_status_checks:
+    - test
+    - lint

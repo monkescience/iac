@@ -1,0 +1,11 @@
+visibility: public
+description: Scoop bucket for monkescience projects
+
+topics:
+  - scoop
+  - scoop-bucket
+
+branch_protection:
+  required_status_checks:
+    - test-powershell
+    - test-pwsh
