@@ -18,7 +18,7 @@ TF_DIRS := components/terraform modules
 # passing AWS_PROFILE=... on the command line. Run `aws sso login` first.
 export AWS_CONFIG_FILE := $(CURDIR)/configs/aws.config.ini
 STAGE := $(lastword $(subst -, ,$(STACK)))
-export AWS_PROFILE ?= monke-eu-central-1-$(STAGE)-admin
+export AWS_PROFILE := monke-eu-central-1-$(STAGE)-admin
 
 # Atmos names the plan file "<stack>-<component>.planfile" with slashes replaced by
 # dashes (e.g. aws/ecr -> ...-aws-ecr.planfile). Mirror that so `make apply` finds it.
