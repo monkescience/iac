@@ -1,10 +1,10 @@
 # Task runner for the Atmos-managed IaC monorepo.
 # Tool versions are pinned in mise.toml -- run `make install` once to get them.
 #
-# Most targets act on a single component in a single stack:
-#   make plan   COMPONENT=organization STACK=monke-root
-#   make apply  COMPONENT=vpc          STACK=monke-dev
-#   make deploy COMPONENT=sso          STACK=monke-root
+# Most targets act on a single component in a single stack. If STACK or
+# COMPONENT is unset, you will be prompted to select from Atmos' known values:
+#   make plan
+#   STACK=monke-dev COMPONENT=aws/vpc make deploy
 #
 # Stack names follow atmos.yaml's name_pattern "{namespace}-{stage}":
 #   monke-dev  monke-prod  monke-root  monkescience-global
@@ -13,31 +13,10 @@
 
 TF_DIRS := components/terraform modules
 
-# AWS auth via the repo's SSO config. The profile is derived from the stack's
-# stage (e.g. STACK=monke-dev -> monke-eu-central-1-dev-admin). Override by
-# passing AWS_PROFILE=... on the command line. Run `aws sso login` first.
+# AWS auth via the repo's SSO config. The profile is derived at runtime from the
+# selected stack's stage (e.g. STACK=monke-dev -> monke-eu-central-1-dev-admin).
+# Override by setting AWS_PROFILE=... before running make. Run `aws sso login` first.
 export AWS_CONFIG_FILE := $(CURDIR)/configs/aws.config.ini
-STAGE := $(lastword $(subst -, ,$(STACK)))
-export AWS_PROFILE := monke-eu-central-1-$(STAGE)-admin
-
-# Atmos names the plan file "<stack>-<component>.planfile" with slashes replaced by
-# dashes (e.g. aws/ecr -> ...-aws-ecr.planfile). Mirror that so `make apply` finds it.
-PLANFILE = $(subst /,-,$(STACK)-$(COMPONENT)).planfile
-
-# run_tf: run an atmos terraform subcommand, resolving the state-encryption passphrase
-# for components that have an encryption.tf (organization, bootstrap, github/repositories).
-# The passphrase comes from $TOFU_STATE_PASSPHRASE if set (e.g. sourced from a password
-# manager: TOFU_STATE_PASSPHRASE=$$(pass tofu/state) make ...), otherwise you are prompted
-# silently. It is never echoed, exported to your shell, or written to your shell history.
-# $(1) = subcommand, $(2) = extra args
-define run_tf
-pass="$$TOFU_STATE_PASSPHRASE"; \
-if [ -f "components/terraform/$(COMPONENT)/encryption.tf" ]; then \
-if [ -z "$$pass" ]; then read -rs -p "tofu state passphrase for $(COMPONENT): " pass </dev/tty; echo; fi; \
-export TF_ENCRYPTION="key_provider \"pbkdf2\" \"default\" { passphrase = \"$$pass\" }"; \
-fi; \
-atmos terraform $(1) $(COMPONENT) -s $(STACK) $(2)
-endef
 
 .PHONY: help
 help: ## List available targets
@@ -66,24 +45,21 @@ lint: ## Lint OpenTofu components and modules with tflint
 	tflint --recursive --chdir=components/terraform
 	tflint --recursive --chdir=modules
 
-guard-%:
-	@if [ -z '$($*)' ]; then echo "Missing required variable: $*"; exit 1; fi
-
 .PHONY: plan
-plan: guard-COMPONENT guard-STACK ## Plan a component and save a plan file (COMPONENT= STACK=)
-	@$(call run_tf,plan)
+plan: ## Plan a component and save a plan file (prompts when STACK/COMPONENT are unset)
+	@STACK="$(STACK)" COMPONENT="$(COMPONENT)" scripts/atmos-tf plan
 
 .PHONY: apply
-apply: guard-COMPONENT guard-STACK ## Apply the plan file from `make plan` (no re-plan)
-	@$(call run_tf,apply,--planfile $(PLANFILE))
+apply: ## Apply the plan file from `make plan` (no re-plan)
+	@STACK="$(STACK)" COMPONENT="$(COMPONENT)" scripts/atmos-tf apply
 
 .PHONY: deploy
-deploy: guard-COMPONENT guard-STACK ## Plan + apply in one shot, auto-approved (skips the review step)
-	@$(call run_tf,deploy)
+deploy: ## Plan + apply in one shot, auto-approved (skips the review step)
+	@STACK="$(STACK)" COMPONENT="$(COMPONENT)" scripts/atmos-tf deploy
 
 .PHONY: destroy
-destroy: guard-COMPONENT guard-STACK ## Destroy a component in a stack
-	@$(call run_tf,destroy)
+destroy: ## Destroy a component in a stack
+	@STACK="$(STACK)" COMPONENT="$(COMPONENT)" scripts/atmos-tf destroy
 
 .PHONY: clean
 clean: ## Remove local .terraform dirs, planfiles, and generated backend files

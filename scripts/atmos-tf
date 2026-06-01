@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  echo "Usage: $0 plan|apply|deploy|destroy" >&2
+}
+
+select_one() {
+  local prompt="$1"
+  shift
+
+  if [[ "$#" -eq 0 ]]; then
+    echo "No $prompt options found" >&2
+    exit 1
+  fi
+
+  if [[ ! -r /dev/tty ]]; then
+    echo "Missing $prompt and no interactive terminal is available" >&2
+    exit 1
+  fi
+
+  local i=1
+  local option
+  for option in "$@"; do
+    printf "%2d) %s\n" "$i" "$option" >/dev/tty
+    i=$((i + 1))
+  done
+
+  local choice
+  while true; do
+    printf "Select %s [1-%d]: " "$prompt" "$#" >/dev/tty
+    IFS= read -r choice </dev/tty
+
+    if [[ ! "$choice" =~ ^[0-9]+$ ]] || (( choice < 1 || choice > $# )); then
+      echo "Enter a number from 1 to $#" >/dev/tty
+      continue
+    fi
+
+    i=1
+    for option in "$@"; do
+      if (( i == choice )); then
+        printf "%s\n" "$option"
+        return 0
+      fi
+      i=$((i + 1))
+    done
+  done
+}
+
+command="${1:-}"
+case "$command" in
+  plan | apply | deploy | destroy) ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac
+
+script_dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+repo_root="$(cd -- "$script_dir/.." && pwd)"
+cd "$repo_root"
+
+export AWS_CONFIG_FILE="${AWS_CONFIG_FILE:-$repo_root/configs/aws.config.ini}"
+
+stack="${STACK:-}"
+component="${COMPONENT:-}"
+
+if [[ -z "$stack" ]]; then
+  mapfile -t stacks < <(atmos list stacks --format=tsv | awk 'NR > 1 {print}')
+  stack="$(select_one stack "${stacks[@]}")"
+fi
+
+if [[ -z "$component" ]]; then
+  mapfile -t components < <(atmos list components -s "$stack" --format=tsv --columns=component | awk 'NR > 1 {print}')
+  component="$(select_one component "${components[@]}")"
+fi
+
+stage="${stack##*-}"
+export AWS_PROFILE="${AWS_PROFILE:-monke-eu-central-1-$stage-admin}"
+
+planfile="$(printf "%s-%s.planfile" "$stack" "$component" | tr / -)"
+pass="${TOFU_STATE_PASSPHRASE:-}"
+
+if [[ -f "components/terraform/$component/encryption.tf" ]]; then
+  if [[ -z "$pass" ]]; then
+    read -r -s -p "tofu state passphrase for $component: " pass </dev/tty
+    echo
+  fi
+  export TF_ENCRYPTION="key_provider \"pbkdf2\" \"default\" { passphrase = \"$pass\" }"
+fi
+
+if [[ "$command" == "apply" ]]; then
+  atmos terraform apply "$component" -s "$stack" --planfile "$planfile"
+else
+  atmos terraform "$command" "$component" -s "$stack"
+fi
