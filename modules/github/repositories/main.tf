@@ -176,6 +176,8 @@ resource "github_repository_dependabot_security_updates" "security_updates" {
 
   repository = github_repository.repository[each.key].name
   enabled    = true
+
+  depends_on = [github_repository_vulnerability_alerts.vulnerability_alerts]
 }
 
 resource "github_repository_vulnerability_alerts" "vulnerability_alerts" {
