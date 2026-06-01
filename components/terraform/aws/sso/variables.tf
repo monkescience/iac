@@ -14,7 +14,6 @@ variable "component" {
   type = string
 }
 
-# tflint-ignore: terraform_unused_declarations
 variable "namespace" {
   type    = string
   default = null

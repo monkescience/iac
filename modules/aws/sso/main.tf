@@ -11,11 +11,7 @@ resource "aws_ssoadmin_managed_policy_attachment" "admin" {
 }
 
 resource "aws_ssoadmin_account_assignment" "admin" {
-  for_each = tomap({
-    "monke-root" = "489721517942"
-    "monke-dev"  = "387105013966"
-    "monke-prod" = "978150176582"
-  })
+  for_each = var.member_account_ids
 
   instance_arn       = tolist(data.aws_ssoadmin_instances.sso_instance.arns)[0]
   target_id          = each.value
