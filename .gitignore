@@ -7,8 +7,12 @@
 *.terraform.tfvars.json
 backend.tf.json
 
-# github/repositories keeps a committed local state (no secrets)
+# Committed, encrypted local state (DR-in-git). Only these exact files are
+# un-ignored; their plaintext *.backup siblings stay ignored.
 !components/terraform/github/repositories/terraform.tfstate
+!components/terraform/aws/bootstrap/dev.terraform.tfstate
+!components/terraform/aws/bootstrap/root.terraform.tfstate
+!components/terraform/aws/bootstrap/prod.terraform.tfstate
 
 # IntelliJ IDEA
 .idea

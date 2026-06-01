@@ -17,3 +17,12 @@ terraform:
       region: eu-central-1
       encrypt: true
       use_lockfile: true
+
+components:
+  terraform:
+    # aws/bootstrap uses committed encrypted local state; the path is stage-scoped
+    # because the component dir is shared by the dev/root/prod stacks.
+    aws/bootstrap:
+      backend:
+        local:
+          path: prod.terraform.tfstate

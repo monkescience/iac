@@ -4,8 +4,9 @@ components:
       metadata:
         component: aws/bootstrap
         terraform_workspace: default
-      backend:
-        s3:
-          key: bootstrap/terraform.tfstate
+      # Local, committed, encrypted state (DR-in-git): the buckets this component
+      # creates can't also hold its own state. The per-stack path is set in each
+      # org file (dev/root/prod) since the component dir is shared across stacks.
+      backend_type: local
       vars:
         component: bootstrap
