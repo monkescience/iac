@@ -9,7 +9,3 @@ components:
           key: api-gateway/terraform.tfstate
       vars:
         component: api-gateway
-        acm_cert_arn: arn:aws:acm:eu-central-1:387105013966:certificate/864b03ca-1a53-4f87-849a-f8f65a0d9b1f
-        route53_zone_id: Z01546261NTTOBINL68WG
-        cognito_user_pool_endpoint: cognito-idp.eu-central-1.amazonaws.com/eu-central-1_Jrl0qRauq
-        cognito_user_pool_client_id: 6k87n5ifio8jo045ot9lbbb2aq
