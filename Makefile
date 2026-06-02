@@ -36,6 +36,16 @@ list: ## List the stacks and components Atmos knows about
 validate: ## Validate stack configuration
 	atmos validate stacks
 
+.PHONY: kubeconfig
+kubeconfig: ## Write the homelab Kubernetes kubeconfig to ./kubeconfig
+	atmos terraform output proxmox/talos-cluster -s monke-homelab -raw kubeconfig --skip-init --logs-level Off > kubeconfig
+	chmod 600 kubeconfig
+
+.PHONY: talosconfig
+talosconfig: ## Write the homelab Talos config to ./talosconfig
+	atmos terraform output proxmox/talos-cluster -s monke-homelab -raw talosconfig --skip-init --logs-level Off > talosconfig
+	chmod 600 talosconfig
+
 .PHONY: fmt
 fmt: ## Format all OpenTofu files
 	tofu fmt -recursive $(TF_DIRS)

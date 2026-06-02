@@ -1,0 +1,9 @@
+import:
+  - catalog/proxmox/talos-cluster
+
+vars:
+  namespace: monke
+  tenant: core
+  environment: homelab
+  stage: homelab
+  project: monke

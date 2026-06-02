@@ -6,6 +6,8 @@
 *.planfile
 *.terraform.tfvars.json
 backend.tf.json
+kubeconfig
+talosconfig
 
 # Committed, encrypted local state (DR-in-git). Only these exact files are
 # un-ignored; their plaintext *.backup siblings stay ignored.

@@ -1,0 +1,48 @@
+components:
+  terraform:
+    proxmox/talos-cluster:
+      metadata:
+        component: proxmox/talos-cluster
+        terraform_workspace: default
+      backend_type: local
+      backend:
+        local:
+          path: homelab-talos-cluster.terraform.tfstate
+      vars:
+        component: talos-cluster
+        proxmox_endpoint: https://192.168.134.100:8006/
+        proxmox_username: root@pam
+        proxmox_insecure: true
+        proxmox_ssh_username: root
+        proxmox_ssh_node_address: 192.168.134.100
+        node_name: proxmox
+        cluster_name: k8s
+        cluster_endpoint: https://192.168.134.101:6443
+        talos_version: v1.13.3
+        kubernetes_version: v1.36.1
+        installer_image: ghcr.io/siderolabs/installer:v1.13.3
+        install_disk: /dev/sda
+        vm_name: k8s
+        vm_id: 101
+        tags:
+          - iac
+          - kubernetes
+          - talos
+        image_datastore_id: local
+        disk_datastore_id: local-lvm
+        talos_image_url: https://factory.talos.dev/image/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba/v1.13.3/nocloud-amd64.raw.zst
+        talos_image_file_name: talos-v1.13.3-nocloud-amd64.img
+        cpu_cores: 16
+        cpu_sockets: 1
+        cpu_type: host
+        memory_mb: 65536
+        disk_size_gb: 64
+        network_bridge: vmbr0
+        node_ip: 192.168.134.101
+        node_ip_cidr: 192.168.134.101/24
+        gateway: 192.168.134.1
+        nameservers:
+          - 192.168.134.1
+        network_interface: eth0
+        started: true
+        on_boot: true
