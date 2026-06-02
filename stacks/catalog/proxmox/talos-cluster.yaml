@@ -16,18 +16,20 @@ components:
         proxmox_ssh_username: root
         proxmox_ssh_node_address: 192.168.134.100
         node_name: proxmox
-        cluster_name: k8s
+        cluster_name: k8s-polaris-core
         cluster_endpoint: https://192.168.134.101:6443
         talos_version: v1.13.3
         kubernetes_version: v1.36.1
         installer_image: ghcr.io/siderolabs/installer:v1.13.3
         install_disk: /dev/sda
-        vm_name: k8s
+        vm_name: k8s-polaris-core
         vm_id: 101
         tags:
           - iac
           - kubernetes
           - talos
+          - polaris
+          - core
         image_datastore_id: local
         disk_datastore_id: local-lvm
         talos_image_url: https://factory.talos.dev/image/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba/v1.13.3/nocloud-amd64.raw.zst

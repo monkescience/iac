@@ -1,5 +1,6 @@
 import:
   - catalog/proxmox/talos-cluster
+  - catalog/proxmox/talos-argocd
 
 vars:
   namespace: monke

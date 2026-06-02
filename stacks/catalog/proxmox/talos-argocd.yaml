@@ -1,0 +1,17 @@
+components:
+  terraform:
+    proxmox/talos-argocd:
+      metadata:
+        component: proxmox/talos-argocd
+        terraform_workspace: default
+      backend_type: local
+      backend:
+        local:
+          path: homelab-talos-argocd.terraform.tfstate
+      vars:
+        component: talos-argocd
+        cluster_name: k8s-polaris-core
+        talos_cluster_state_path: ../talos-cluster/homelab-talos-cluster.terraform.tfstate
+        gitops_repository: monkescience/gitops-proxmox
+        gitops_target_revision: main
+        argocd_chart_version: 9.5.15
