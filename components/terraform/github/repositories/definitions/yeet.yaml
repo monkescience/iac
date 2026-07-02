@@ -1,5 +1,5 @@
 visibility: public
-description: Automate releases based on conventional commits
+description: Release automation for GitHub, GitLab, and Azure DevOps based on conventional commits
 
 topics:
   - cli
@@ -9,6 +9,10 @@ topics:
   - changelog
   - semver
   - calver
+  - github
+  - gitlab
+  - azure-devops
+  - release-please
 
 branch_protection:
   required_status_checks:
