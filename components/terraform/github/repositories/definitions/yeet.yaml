@@ -15,7 +15,7 @@ topics:
   - release-please
 
 branch_protection:
-  strict_required_status_checks: true
+  strict_required_status_checks: false
   required_status_checks:
     - test
     - lint
