@@ -1,4 +1,4 @@
 [tools]
 opentofu = "1.13.2"
 atmos = "1.231.0"
-tflint = "0.64.0"
+tflint = "0.65.0"
